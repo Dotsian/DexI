@@ -18,10 +18,10 @@ Using DexI over the traditional method for package management is far better, as 
 
 ## Installation
 
-You can install and update DexI using [pip](https://www.python.org/downloads/):
+You can install and update DexI using [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```bash
-pip install git+https://github.com/Dotsian/DexI.git
+uv tool install git+https://github.com/Dotsian/DexI
 ```
 
 ## Usage
