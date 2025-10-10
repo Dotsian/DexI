@@ -3,6 +3,7 @@ import os
 import random
 import shutil
 import zipfile
+from pathlib import Path
 from typing import cast
 
 import requests
@@ -50,9 +51,9 @@ def uninstall_package(package: str):
     if data.app is not None and not app_operations_supported():
         return
 
-    desination = f"{os.getcwd()}/ballsdex/packages/{data.package.target}"
+    destination = Path.cwd() / "ballsdex" / "packages" / data.package.target
 
-    if not os.path.isdir(desination):
+    if not destination.is_dir():
         return
 
     if data.app is not None:
@@ -65,7 +66,7 @@ def uninstall_package(package: str):
 
     remove_list_entry("packages", f"ballsdex.packages.{data.package.target}")
 
-    shutil.rmtree(desination)
+    shutil.rmtree(destination)
 
 
 def install_package(
@@ -93,16 +94,16 @@ def install_package(
     author, repository = repository.split("/")
 
     zip_url = f"https://github.com/{author}/{repository}/archive/refs/heads/{branch}.zip"
-    desination = f"{os.getcwd()}/ballsdex/packages/{data.package.target}"
+    destination = Path.cwd() / "ballsdex" / "packages" / data.package.target
 
     name = package_name(repository, branch)
 
-    if os.path.isdir(desination):
+    if destination.is_dir():
         if cancel_if_exists:
             return False
 
         replaced = True
-        shutil.rmtree(desination)
+        shutil.rmtree(destination)
 
     if data.app is not None:
         if not app_operations_supported():
@@ -111,15 +112,15 @@ def install_package(
                 f"on Ballsdex v$BD_V, please update to v{SUPPORTED_APP_VERSION}+"
             )
 
-        app_desination = f"{os.getcwd()}/admin_panel/{data.app.target}"
+        app_destination = Path.cwd() / "admin_panel" / data.app.target
 
-        if os.path.isdir(app_desination):
+        if app_destination.is_dir():
             replaced = True
-            shutil.rmtree(app_desination)
+            shutil.rmtree(app_destination)
 
-        os.makedirs(app_desination, exist_ok=True)
+        app_destination.mkdir(parents=True, exist_ok=True)
 
-    os.makedirs(desination, exist_ok=True)
+    destination.mkdir(parents=True, exist_ok=True)
 
     response = requests.get(zip_url)
 
@@ -131,10 +132,7 @@ def install_package(
 
         for member in z.namelist():
             if member[-7:] in ["LICENSE", "LICENCE"]:
-                with (
-                    z.open(member) as src,
-                    open(f"{desination}/{member[-7:]}", "wb") as dst,
-                ):
+                with z.open(member) as src, (destination / member[-7:]).open("wb") as dst:
                     shutil.copyfileobj(src, dst)
 
                 continue
@@ -147,7 +145,7 @@ def install_package(
             if not relative_path or relative_path in data.package.exclude:
                 continue
 
-            target_path = os.path.join(desination, relative_path)
+            target_path = destination / relative_path
 
             if member.endswith("/"):
                 os.makedirs(target_path, exist_ok=True)
@@ -159,7 +157,12 @@ def install_package(
                 shutil.copyfileobj(src, dst)
 
         if data.app is not None:  # I'll refactor this later
-            app_desination = cast(str, app_desination)  # type: ignore
+            if not app_destination:
+                # something has gone remarkably wrong
+                # (shouldnt be possible)
+                raise Exception(
+                    "Somehow app_destination has gone missing while copying files"
+                )
 
             for member in z.namelist():
                 if not member.startswith(f"{base_folder}{data.app.source}/"):
@@ -170,15 +173,15 @@ def install_package(
                 if not relative_path:
                     continue
 
-                target_path = os.path.join(app_desination, relative_path)
+                target_path = app_destination / relative_path
 
                 if member.endswith("/"):
-                    os.makedirs(target_path, exist_ok=True)
+                    target_path.mkdir(parents=True, exist_ok=True)
                     continue
 
-                os.makedirs(os.path.dirname(target_path), exist_ok=True)
+                target_path.parent.mkdir(parents=True, exist_ok=True)
 
-                with z.open(member) as src, open(target_path, "wb") as dst:
+                with z.open(member) as src, target_path.open("wb") as dst:
                     shutil.copyfileobj(src, dst)
 
             add_list_entry(

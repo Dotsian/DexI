@@ -1,6 +1,6 @@
-import os
 import re
 import sys
+from pathlib import Path
 from typing import cast
 
 import requests
@@ -50,7 +50,7 @@ def fetch_pyproject(package: str, branch: str) -> dict:
     return data
 
 
-def parse_pyproject(path: str | None = None) -> TOMLDocument:
+def parse_pyproject(path: Path | None = None) -> TOMLDocument:
     """
     Parses a pyproject file and returns it.
 
@@ -60,14 +60,14 @@ def parse_pyproject(path: str | None = None) -> TOMLDocument:
         The path that holds the pyproject file.
     """
     if path is None:
-        path = os.getcwd()
+        path = Path.cwd()
 
-    path = f"{path}/pyproject.toml"
+    path = path / "pyproject.toml"
 
-    if not os.path.isfile(path):
+    if not path.is_file():
         error("Failed to find [red]pyproject.toml[/red] in the current directory")
 
-    with open(path) as file:
+    with path.open() as file:
         return parse(file.read())
 
 
@@ -78,7 +78,7 @@ def app_operations_supported() -> bool:
     return parse_version(fetch_ballsdex_version()) >= parse_version(SUPPORTED_APP_VERSION)
 
 
-def fetch_ballsdex_version(path: str | None = None) -> str:
+def fetch_ballsdex_version(path: Path | None = None) -> str:
     """
     Returns the Ballsdex version.
 
@@ -88,14 +88,14 @@ def fetch_ballsdex_version(path: str | None = None) -> str:
         The path that will be checked.
     """
     if path is None:
-        path = os.getcwd()
+        path = Path.cwd()
 
-    path = f"{path}/ballsdex/__init__.py"
+    path = path / "ballsdex/__init__.py"
 
-    if not os.path.isfile(path):
+    if not path.is_file():
         error("Failed to find [red]ballsdex/__init__.py[/red] in the current directory")
 
-    with open(path) as file:
+    with path.open() as file:
         return file.read().replace('__version__ = "', "").rstrip()[:-1]
 
 
@@ -150,7 +150,7 @@ def fetch_all_packages() -> list[PackageEntry]:
     return cast(list[PackageEntry], packages)
 
 
-def add_list_entry(section: str, entry: str, path: str | None = None):
+def add_list_entry(section: str, entry: str, path: Path | None = None):
     """
     Adds an item to a list in the config file.
 
@@ -164,9 +164,11 @@ def add_list_entry(section: str, entry: str, path: str | None = None):
         The config file path.
     """
     if path is None:
-        path = os.getcwd()
+        path = Path.cwd()
 
-    with open(f"{path}/config.yml") as file:
+    path = path / "config.yml"
+
+    with path.open() as file:
         lines = file.readlines()
 
     item = f"  - {entry}\n"
@@ -179,11 +181,11 @@ def add_list_entry(section: str, entry: str, path: str | None = None):
             lines.insert(i + 1, item)
             break
 
-    with open(f"{path}/config.yml", "w") as file:
+    with path.open("w") as file:
         file.writelines(lines)
 
 
-def remove_list_entry(section: str, entry: str, path: str | None = None):
+def remove_list_entry(section: str, entry: str, path: Path | None = None):
     """
     Removes an item from a list in the config file.
 
@@ -197,9 +199,11 @@ def remove_list_entry(section: str, entry: str, path: str | None = None):
         The config file path.
     """
     if path is None:
-        path = os.getcwd()
+        path = Path.cwd()
 
-    with open(f"{path}/config.yml") as file:
+    path = path / "config.yml"
+
+    with path.open() as file:
         lines = file.readlines()
 
     item = f"  - {entry}\n"
@@ -209,7 +213,7 @@ def remove_list_entry(section: str, entry: str, path: str | None = None):
 
     lines.remove(item)
 
-    with open(f"{path}/config.yml", "w") as file:
+    with path.open("w") as file:
         file.writelines(lines)
 
 
