@@ -26,7 +26,7 @@ pip install git+https://github.com/Dotsian/DexI.git
 
 ## Usage
 
-> ![WARNING]
+> [!WARNING]
 > Always ensure the package you're downloading can be **trusted**, otherwise malicious code can be executed on your application.
 
 Type `dexi --help` to view a list of commands.
@@ -76,7 +76,7 @@ dexi update
 
 ## DexI package compatibility
 
-> ![NOTE]
+> [!NOTE]
 > If you're updating a package, make sure to update the version in the `pyproject.toml` file, otherwise DexI won't notice if an update was made.
 
 Package creators can easily add DexI support to their packages. An **[example package with DexI support](https://github.com/Dotsian/DexI-Package)** has been created to help creators add DexI support to their packages. Here is a step by step guide on how you can add DexI support:
