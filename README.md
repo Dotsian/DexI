@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/Dotsian/DexI/actions/workflows/CI.yml/badge.svg)](https://github.com/Dotsian/DexI/actions/workflows/CI.yml)
 [![Issues](https://img.shields.io/github/issues/Dotsian/DexI)](https://github.com/Dotsian/DexI/issues)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/Dotsian/DexI/blob/master/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue)](https://github.com/Dotsian/DexI/blob/master/CHANGELOG.md)
 
 Dex Inventory "DexI" is a Ballsdex package manager developed by DotZZ that provides developers with package control and easily allows users to add, remove, install, and update third-party packages.
 
@@ -18,10 +18,16 @@ Using DexI over the traditional method for package management is far better, as 
 
 ## Installation
 
-You can install and update DexI using [uv](https://docs.astral.sh/uv/getting-started/installation/):
+You can install DexI using [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```bash
 uv tool install git+https://github.com/Dotsian/DexI
+```
+
+Updating DexI with uv:
+
+```bash
+uv tool upgrade dexi
 ```
 
 ## Usage
