@@ -56,7 +56,7 @@ def update(package: str | None = None):
         The package you want to update.
         Automatically updates all packages if not specified.
     """
-    Errors(["invalid_project", "invalid_version", "no_config_found"]).check
+    Errors(["invalid_project", "invalid_version", "no_config_found"]).check()
 
     if package is None:
         update_all_packages()
