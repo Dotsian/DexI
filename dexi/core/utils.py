@@ -1,7 +1,6 @@
-import os
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 from typing import cast
 
 import requests
