@@ -3,6 +3,14 @@ from packaging.version import parse as parse_version
 from ..core.utils import console, fetch_all_packages, fetch_pyproject, package_name
 
 
+def autocomplete_packages(incomplete: str) -> list[str]:
+    return [
+        package["git"]
+        for package in fetch_all_packages()
+        if package["git"].startswith(incomplete)
+    ]
+
+
 def list_packages(hide_update: bool = False):
     """
     Displays a list of packages.

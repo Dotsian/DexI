@@ -1,4 +1,5 @@
 import typer
+from typing_extensions import Annotated
 
 from .commands.installer import install_packages
 from .commands.manager import (
@@ -7,7 +8,7 @@ from .commands.manager import (
     update_all_packages,
     update_package,
 )
-from .commands.viewer import list_packages
+from .commands.viewer import autocomplete_packages, list_packages
 from .core.errors import Errors
 
 app = typer.Typer()
@@ -31,7 +32,14 @@ def add(package: str, branch: str = "main"):
 
 
 @app.command()
-def remove(package: str):
+def remove(
+    package: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the package", autocompletion=autocomplete_packages
+        ),
+    ],
+):
     """
     Removes and uninstalls a package.
 
@@ -46,7 +54,15 @@ def remove(package: str):
 
 
 @app.command()
-def update(package: str | None = None):
+def update(
+    package: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the package", autocompletion=autocomplete_packages
+        ),
+    ]
+    | None = None,
+):
     """
     Updates all packages or a specified package.
 
