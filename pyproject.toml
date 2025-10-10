@@ -1,0 +1,51 @@
+[project]
+name = "DexI"
+version = "1.0.0"
+description = 'Dex Inventory "DexI" package manager for Ballsdex'
+requires-python = ">=3.12"
+license = "MIT"
+dependencies = [
+    "holidays>=0.81",
+    "packaging>=25.0",
+    "requests>=2.32.5",
+    "rich>=14.1.0",
+    "tomlkit>=0.13.3",
+    "typer>=0.19.2",
+]
+
+[project.scripts]
+dexi = "dexi.app:app"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+dev-dependencies = [
+    "mypy>=1.18.2",
+    "ruff>=0.13.2",
+    "types-requests>=2.32.4.20250913",
+]
+
+[tool.ruff]
+line-length = 90
+indent-width = 4
+target-version = "py313"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E203"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.setuptools.packages.find]
+exclude = ["assets", "assets.*"]
+
+[tool.setuptools]
+include-package-data = false
