@@ -1,9 +1,9 @@
-import os
 from dataclasses import dataclass, field
 
 from packaging.version import parse as parse_version
 
 from .utils import error, fetch_ballsdex_version
+from pathlib import Path
 
 SUPPORTED_VERSION = "2.22.0"
 
@@ -18,14 +18,14 @@ class Errors:
 
     @staticmethod
     def invalid_project() -> None:
-        if os.path.isdir("ballsdex") and os.path.isfile("pyproject.toml"):
+        if Path("ballsdex").is_dir() and Path("pyproject.toml").is_file():
             return
 
         error("Attempted to use DexI command on an invalid project")
 
     @staticmethod
     def no_config_found() -> None:
-        if os.path.isfile("config.yml"):
+        if Path("config.yml").is_file():
             return
 
         error("No 'config.yml' file detected")
