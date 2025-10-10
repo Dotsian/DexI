@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from packaging.version import parse as parse_version
 
 from .utils import error, fetch_ballsdex_version
-from pathlib import Path
 
 SUPPORTED_VERSION = "2.22.0"
 

@@ -1,9 +1,9 @@
 import io
 import os
-from pathlib import Path
 import random
 import shutil
 import zipfile
+from pathlib import Path
 from typing import cast
 
 import requests
