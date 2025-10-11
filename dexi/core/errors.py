@@ -21,14 +21,14 @@ class Errors:
         if os.path.isdir("ballsdex") and os.path.isfile("pyproject.toml"):
             return
 
-        error("Attempted to use DexI command on an invalid project")
+        error("Attempted to use [red]DexI[/red] command on an [red]invalid project[/red]")
 
     @staticmethod
     def no_config_found() -> None:
         if os.path.isfile("config.yml"):
             return
 
-        error("No 'config.yml' file detected")
+        error("No [red]'config.yml'[/red] file detected")
 
     @staticmethod
     def invalid_version() -> None:
@@ -36,7 +36,7 @@ class Errors:
             return
 
         error(
-            "DexI does not support Ballsdex v$BD_V, please update to "
+            "DexI does not support [red]Ballsdex v$BD_V[/red], please update to "
             f"v{SUPPORTED_VERSION}+"
         )
 

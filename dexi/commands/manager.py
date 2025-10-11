@@ -46,9 +46,9 @@ def add_package(package: str, branch: str):
 
         if installed_version not in specifier:
             error(
-                f"Ballsdex version requirement for '{package}' is set to "
-                f"'{data.ballsdex_version}', while this instance is on "
-                f"version '{ballsdex}'"
+                f"Ballsdex version requirement for [red]'{package}'[/red] is set to "
+                f"[red]'{data.ballsdex_version}'[/red], while this instance is on "
+                f"version [red]'{ballsdex}'[/red]"
             )
 
     project = parse_pyproject()
@@ -58,7 +58,7 @@ def add_package(package: str, branch: str):
     dexi = tool.setdefault("dexi", table())
 
     if not initialized and fetch_package(package, fetch_all_packages()) is not None:
-        error("This package has already been added")
+        error("This [red]package[/red] has already been added")
 
     package_array = dexi.setdefault("packages", array().multiline(True))
 
@@ -113,7 +113,7 @@ def remove_package(package: str):
     package_entry = fetch_package(package, dexi_tool["packages"])
 
     if package_entry is None:
-        error(f"Could not find '{package}' package")
+        error(f"Could not find [red]'{package}'[/red] package")
         return
 
     uninstall_package(package)
@@ -176,12 +176,12 @@ def update_package(package: str | PackageEntry):
     dexi_project = parse_pyproject()
 
     if "tool" not in dexi_project or "dexi" not in dexi_project["tool"]:  # type: ignore
-        error("pyproject.toml contains invalid DexI data")
+        error("[red]pyproject.toml[/red] contains invalid [red]DexI data[/red]")
 
     dexi_tool = dexi_project["tool"]["dexi"]  # type: ignore
 
     if "packages" not in dexi_tool:  # type: ignore
-        error("pyproject.toml contains invalid DexI data")
+        error("[[red]pyproject.toml[/red] contains invalid [red]DexI data[/red]")
 
     packages = dexi_tool["packages"]  # type: ignore
 
