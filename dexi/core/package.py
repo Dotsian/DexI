@@ -59,7 +59,9 @@ class Package:
             error(f"Could not locate {package_name(package, branch)}")
 
         package_config = PackageConfig(
-            dexi_package["source"], dexi_package["target"], dexi_package.get("exclude", [])
+            dexi_package["source"],
+            dexi_package["target"],
+            dexi_package.get("exclude", [])
         )
 
         fields = {
