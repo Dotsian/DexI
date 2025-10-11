@@ -43,7 +43,7 @@ def uninstall_package(package: str):
     found_package = fetch_package(package, dexi_tool["packages"])
 
     if found_package is None:
-        error(f"Could not find '{package}' package")
+        error(f"Could not find [red]'{package}'[/red] package")
         return
 
     data = Package.from_git(found_package["git"], found_package["branch"])
@@ -108,8 +108,8 @@ def install_package(
     if data.app is not None:
         if not app_operations_supported():
             error(
-                f"DexI packages with Django apps are not supported "
-                f"on Ballsdex v$BD_V, please update to v{SUPPORTED_APP_VERSION}+"
+                f"[red]DexI packages[/red] with Django apps are not supported "
+                f"on [red]Ballsdex v$BD_V[/red], please update to v{SUPPORTED_APP_VERSION}+"
             )
 
         app_destination = Path.cwd() / "admin_panel" / data.app.target
@@ -125,7 +125,7 @@ def install_package(
     response = requests.get(zip_url)
 
     if not response.ok:
-        error(f"Failed to fetch {name}")
+        error(f"Failed to fetch [red]{name}[/red]")
 
     with zipfile.ZipFile(io.BytesIO(response.content)) as z:
         base_folder = f"{repository}-{branch}/"

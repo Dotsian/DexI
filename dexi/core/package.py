@@ -3,7 +3,6 @@ from typing import Self
 
 from .utils import error, fetch_pyproject, package_name
 
-
 @dataclass
 class PackageConfig:
     """
@@ -44,19 +43,19 @@ class Package:
     def from_git(cls, package: str, branch: str) -> Self:
         if package.count("/") != 1:
             error(
-                "Invalid GitHub repository identifier entered; Expected <name/repository>"
+                "Invalid GitHub repository identifier entered; Expected [red]<name/repository>[/red]"
             )
 
         data = fetch_pyproject(package, branch)
 
         if not data or "tool" not in data or "dexi" not in data["tool"]:
-            error(f"Could not locate {package_name(package, branch)}")
+            error(f"Could not locate [red]{package_name(package, branch)}[/red]")
 
         dexi_tool = data["tool"]["dexi"]
         dexi_package = dexi_tool["package"]
 
         if not dexi_tool.get("public", False):
-            error(f"Could not locate {package_name(package, branch)}")
+            error(f"Could not locate [red]{package_name(package, branch)}[/red]")
 
         package_config = PackageConfig(
             dexi_package["source"],
