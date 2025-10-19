@@ -108,8 +108,8 @@ def install_package(
     if data.app is not None:
         if not app_operations_supported():
             error(
-                f"[red]DexI packages[/red] with Django apps are not supported "
-                f"on [red]Ballsdex v$BD_V[/red], please update to v{SUPPORTED_APP_VERSION}+"
+                f"[red]DexI packages[/red] with Django apps are not supported on "
+                f"red]Ballsdex v$BD_V[/red], please update to v{SUPPORTED_APP_VERSION}+"
             )
 
         app_destination = Path.cwd() / "admin_panel" / data.app.target

@@ -3,6 +3,7 @@ from typing import Self
 
 from .utils import error, fetch_pyproject, package_name
 
+
 @dataclass
 class PackageConfig:
     """
@@ -43,7 +44,8 @@ class Package:
     def from_git(cls, package: str, branch: str) -> Self:
         if package.count("/") != 1:
             error(
-                "Invalid GitHub repository identifier entered; Expected [red]<name/repository>[/red]"
+                "Invalid GitHub repository identifier entered; "
+                "Expected [red]<name/repository>[/red]"
             )
 
         data = fetch_pyproject(package, branch)
