@@ -10,7 +10,7 @@
 
 Dex Inventory "DexI" is a Ballsdex package manager developed by DotZZ that provides developers with package control and easily allows users to add, remove, install, and update third-party packages.
 
-_**App support will only be available after Ballsdex v2.29.4**_
+_**Packages with Django apps can only be downloaded from Ballsdex v2.29.5+**_
 
 ## DexI vs. the Traditional Method
 
