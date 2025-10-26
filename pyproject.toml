@@ -5,6 +5,7 @@ description = 'Dex Inventory "DexI" package manager for Ballsdex'
 requires-python = ">=3.12"
 license = "MIT"
 dependencies = [
+    "gitpython>=3.1.45",
     "holidays>=0.81",
     "packaging>=25.0",
     "requests>=2.32.5",

@@ -62,7 +62,7 @@ class Package:
         package_config = PackageConfig(
             dexi_package["source"],
             dexi_package["target"],
-            dexi_package.get("exclude", [])
+            dexi_package.get("exclude", []),
         )
 
         fields = {
