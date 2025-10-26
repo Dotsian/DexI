@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import random
 import shutil
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from _typeshed import StrPath
 from git import Repo
 
 from ..core.dexi_types import PackageEntry
@@ -20,6 +21,11 @@ from ..core.utils import (
     parse_pyproject,
     remove_list_entry,
 )
+
+if TYPE_CHECKING:
+    from os import PathLike
+
+    StrPath = str | PathLike
 
 
 def uninstall_package(package: str):
@@ -92,9 +98,9 @@ def install_package(
     # this should be reworked so it doesn't only work for github
     # but for now this should suffice
     repository_url = f"https://github.com/{author}/{repository}.git"
+    package_destination = Path.cwd() / "ballsdex" / "packages" / data.package.target
 
     name = package_name(repository, branch)
-    package_destination = Path.cwd() / "ballsdex" / "packages" / data.package.target
 
     # We want to make sure that all packages from the same repo and branch
     # use the same "cache", but also that if the package is in a diff branch
@@ -108,7 +114,6 @@ def install_package(
 
         replaced = True
         shutil.rmtree(package_destination)
-    package_destination.mkdir(parents=True, exist_ok=True)
 
     if data.app is not None:
         if not app_operations_supported():
@@ -123,8 +128,6 @@ def install_package(
             replaced = True
             shutil.rmtree(app_destination)
 
-        app_destination.mkdir(parents=True, exist_ok=True)
-
     if (cache_dir / ".git").is_dir():
         # pkg already cloned prior, so we can just pull
         repo = Repo.init(cache_dir)
@@ -135,18 +138,22 @@ def install_package(
                 ", but there is no origin remote"
             )
 
-        if not repo.remotes.oring.url == repository_url:
+        if not repo.remotes.origin.url == repository_url:
             error(
                 f"[red]Cache dir exists for package at {cache_dir}"
                 ", but it does not have the same remote url![/red]"
             )
 
         repo.remotes.origin.pull()
-        repo.git.checkout("-b", branch)
     else:
         cache_dir.mkdir(parents=True)
         repo = Repo.clone_from(repository_url, cache_dir)
-        repo.git.checkout("-b", branch)
+
+    if branch not in [b.name for b in repo.branches]:
+        print([b.name for b in repo.branches])
+        error(f"[red]Asked to install branch {branch} but it is not present in repo!")
+
+    repo.git.checkout(branch)
 
     package_src = cache_dir / data.package.source
     app_src: Path | None = None
@@ -157,8 +164,6 @@ def install_package(
         app_src = cache_dir / data.app.source
         if not app_src.is_dir():
             error(f"[red]App source {data.app.source} not found in package!")
-
-    package_destination.symlink_to(package_src)
 
     def copy_ignore_func(dir: StrPath, files: list[str]) -> list[str]:
         dir = Path(dir)
