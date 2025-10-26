@@ -1,9 +1,9 @@
-from _typeshed import StrPath
 import random
 import shutil
 from pathlib import Path
 from typing import cast
 
+from _typeshed import StrPath
 from git import Repo
 
 from ..core.dexi_types import PackageEntry
