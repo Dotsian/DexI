@@ -1,7 +1,7 @@
 import re
 import sys
 from pathlib import Path
-from typing import cast
+from typing import Never, cast
 
 import requests
 from packaging.version import parse as parse_version
@@ -217,7 +217,7 @@ def remove_list_entry(section: str, entry: str, path: Path | None = None):
         file.writelines(lines)
 
 
-def error(message: str) -> None:
+def error(message: str) -> Never:
     """
     Outputs a formatted error and stops execution.
 

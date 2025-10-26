@@ -1,12 +1,10 @@
-import io
-import os
+from _typeshed import StrPath
 import random
 import shutil
-import zipfile
 from pathlib import Path
 from typing import cast
 
-import requests
+from git import Repo
 
 from ..core.dexi_types import PackageEntry
 from ..core.fun import get_special
@@ -44,7 +42,6 @@ def uninstall_package(package: str):
 
     if found_package is None:
         error(f"Could not find [red]'{package}'[/red] package")
-        return
 
     data = Package.from_git(found_package["git"], found_package["branch"])
 
@@ -92,18 +89,26 @@ def install_package(
     data = Package.from_git(repository, branch)
 
     author, repository = repository.split("/")
-
-    zip_url = f"https://github.com/{author}/{repository}/archive/refs/heads/{branch}.zip"
-    destination = Path.cwd() / "ballsdex" / "packages" / data.package.target
+    # this should be reworked so it doesn't only work for github
+    # but for now this should suffice
+    repository_url = f"https://github.com/{author}/{repository}.git"
 
     name = package_name(repository, branch)
+    package_destination = Path.cwd() / "ballsdex" / "packages" / data.package.target
 
-    if destination.is_dir():
+    # We want to make sure that all packages from the same repo and branch
+    # use the same "cache", but also that if the package is in a diff branch
+    # or a different repo it doesn't accidently get updated when something else
+    # does.
+    cache_dir = Path.cwd() / "dexi-cache" / f"{author}-{repository}-{branch}"
+
+    if package_destination.exists():
         if cancel_if_exists:
             return False
 
         replaced = True
-        shutil.rmtree(destination)
+        shutil.rmtree(package_destination)
+    package_destination.mkdir(parents=True, exist_ok=True)
 
     if data.app is not None:
         if not app_operations_supported():
@@ -114,82 +119,73 @@ def install_package(
 
         app_destination = Path.cwd() / "admin_panel" / data.app.target
 
-        if app_destination.is_dir():
+        if app_destination.exists():
             replaced = True
             shutil.rmtree(app_destination)
 
         app_destination.mkdir(parents=True, exist_ok=True)
 
-    destination.mkdir(parents=True, exist_ok=True)
+    if (cache_dir / ".git").is_dir():
+        # pkg already cloned prior, so we can just pull
+        repo = Repo.init(cache_dir)
 
-    response = requests.get(zip_url)
-
-    if not response.ok:
-        error(f"Failed to fetch [red]{name}[/red]")
-
-    with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-        base_folder = f"{repository}-{branch}/"
-
-        for member in z.namelist():
-            if member[-7:] in ["LICENSE", "LICENCE"]:
-                with z.open(member) as src, (destination / member[-7:]).open("wb") as dst:
-                    shutil.copyfileobj(src, dst)
-
-                continue
-
-            if not member.startswith(f"{base_folder}{data.package.source}/"):
-                continue
-
-            relative_path = member[len(base_folder + data.package.source) + 1 :]
-
-            if not relative_path or relative_path in data.package.exclude:
-                continue
-
-            target_path = destination / relative_path
-
-            if member.endswith("/"):
-                os.makedirs(target_path, exist_ok=True)
-                continue
-
-            os.makedirs(os.path.dirname(target_path), exist_ok=True)
-
-            with z.open(member) as src, open(target_path, "wb") as dst:
-                shutil.copyfileobj(src, dst)
-
-        if data.app is not None:  # I'll refactor this later
-            if not app_destination:
-                # something has gone remarkably wrong
-                # (shouldnt be possible)
-                raise Exception(
-                    "Somehow app_destination has gone missing while copying files"
-                )
-
-            for member in z.namelist():
-                if not member.startswith(f"{base_folder}{data.app.source}/"):
-                    continue
-
-                relative_path = member[len(base_folder + data.app.source) + 1 :]
-
-                if not relative_path:
-                    continue
-
-                target_path = app_destination / relative_path
-
-                if member.endswith("/"):
-                    target_path.mkdir(parents=True, exist_ok=True)
-                    continue
-
-                target_path.parent.mkdir(parents=True, exist_ok=True)
-
-                with z.open(member) as src, target_path.open("wb") as dst:
-                    shutil.copyfileobj(src, dst)
-
-            add_list_entry(
-                "extra-tortoise-models",
-                f"ballsdex.packages.{data.package.target}.{data.app.models}",
+        if not getattr(repo.remotes, "origin", None):
+            error(
+                f"[red]Cache dir exists for package at {cache_dir}"
+                ", but there is no origin remote"
             )
 
-            add_list_entry("extra-django-apps", data.app.target)
+        if not repo.remotes.oring.url == repository_url:
+            error(
+                f"[red]Cache dir exists for package at {cache_dir}"
+                ", but it does not have the same remote url![/red]"
+            )
+
+        repo.remotes.origin.pull()
+        repo.git.checkout("-b", branch)
+    else:
+        cache_dir.mkdir(parents=True)
+        repo = Repo.clone_from(repository_url, cache_dir)
+        repo.git.checkout("-b", branch)
+
+    package_src = cache_dir / data.package.source
+    app_src: Path | None = None
+
+    if not package_src.is_dir():
+        error(f"[red]Source dir {data.package.source} not found in package!")
+    if data.app:
+        app_src = cache_dir / data.app.source
+        if not app_src.is_dir():
+            error(f"[red]App source {data.app.source} not found in package!")
+
+    package_destination.symlink_to(package_src)
+
+    def copy_ignore_func(dir: StrPath, files: list[str]) -> list[str]:
+        dir = Path(dir)
+        return [
+            str(dir.relative_to(cache_dir) / file)
+            for file in files
+            if file in data.package.exclude
+        ]
+
+    shutil.copytree(
+        package_src, package_destination, dirs_exist_ok=True, ignore=copy_ignore_func
+    )
+
+    if data.app:
+        if not app_src:
+            # not possible but it makes the type checker complain
+            # if this isn't here
+            return False
+
+        shutil.copytree(app_src, app_destination, dirs_exist_ok=True)
+
+        add_list_entry(
+            "extra-tortoise-models",
+            f"ballsdex.packages.{data.package.target}.{data.app.models}",
+        )
+
+        add_list_entry("extra-django-apps", data.app.target)
 
     add_list_entry("packages", f"ballsdex.packages.{data.package.target}")
 
