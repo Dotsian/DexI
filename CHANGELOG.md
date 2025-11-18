@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 (DEV)
+
+- Use Git for installing packages ([#11](<https://github.com/Dotsian/DexI/pull/11>))
+- Add `force-branch-flag` setting to force users to specify the branch they want to install the package from
+
+### Contributors
+
+- [@Dotsian](<https://github.com/Dotsian>)
+- [@dormieriancitizen](<https://github.com/dormieriancitizen>)
+
 ## 1.1.0 (2025-10-21)
 
 - Add package name autocomplete for `dexi remove` and `dexi update` ([#8](<https://github.com/Dotsian/DexI/pull/8>))
@@ -11,10 +21,10 @@
 
 ### Contributors
 
+- [@Dotsian](<https://github.com/Dotsian>)
 - [@dormieriancitizen](<https://github.com/dormieriancitizen>)
 - [@ethanthopkins](<https://github.com/ethanthopkins>)
 
 ## 1.0.0 (2025-10-08)
 
 - Release DexI version 1.0.0
-

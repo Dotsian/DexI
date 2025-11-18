@@ -37,16 +37,20 @@ class Package:
 
     ballsdex_version: str | None = None
     include_license: bool = True
+    force_branch_flag: bool = False
 
     app: AppConfig | None = None
 
     @classmethod
-    def from_git(cls, package: str, branch: str) -> Self:
+    def from_git(cls, package: str, branch: str | None = None) -> Self:
         if package.count("/") != 1:
             error(
                 "Invalid GitHub repository identifier entered; "
                 "Expected [red]<name/repository>[/red]"
             )
+
+        if branch is None:
+            branch = "main"
 
         data = fetch_pyproject(package, branch)
 
@@ -69,6 +73,7 @@ class Package:
             "version": data["project"]["version"],
             "ballsdex_version": dexi_tool.get("ballsdex-version"),
             "include_license": dexi_tool.get("include-license", True),
+            "force_branch_flag": dexi_tool.get("force-branch-flag", False),
             "package": package_config,
         }
 

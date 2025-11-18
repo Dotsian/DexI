@@ -15,7 +15,7 @@ app = typer.Typer()
 
 
 @app.command()
-def add(package: str, branch: str = "main"):
+def add(package: str, branch: str | None = None):
     """
     Adds a package.
 

@@ -123,11 +123,13 @@ Add the following sections into your `pyproject.toml` file. If your package does
 public = true
 ballsdex-version = ">=2.22.0"
 include-license = true
+force-branch-flag = false
 ```
 
 - `public` - Whether the package can be downloaded with DexI.
 - `ballsdex-version` - The Ballsdex version that this package supports. Supports operators such as `>=`, `==`, etc.
 - `include-license` - Whether the license will also be installed into the package.
+- `force-branch-flag` - Whether you want to force users to use the branch flag to install your package (useful for a repository that has multiple packages and uses branches).
 
 #### dexi.package
 

@@ -21,7 +21,7 @@ from ..core.utils import (
 )
 
 
-def add_package(package: str, branch: str):
+def add_package(package: str, branch: str | None = None):
     """
     Adds a package into the pyproject file.
 
@@ -29,10 +29,19 @@ def add_package(package: str, branch: str):
     ----------
     package: str
         The package you want to add.
-    branch: str
+    branch: str | None
         The package's branch you want to retrieve the package from.
     """
     data = Package.from_git(package, branch)
+
+    if data.force_branch_flag and branch is None:
+        error(
+            f"[red]'{package}'[/red] requires a branch to be "
+            "specified using the [red]`--branch`[/red] flag"
+        )
+
+    if branch is None:
+        branch = "main"
 
     if data.ballsdex_version:
         ballsdex = fetch_ballsdex_version()

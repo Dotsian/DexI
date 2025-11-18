@@ -160,13 +160,16 @@ def install_package(
 
     if not package_src.is_dir():
         error(f"[red]Source dir {data.package.source} not found in package!")
+
     if data.app:
         app_src = cache_dir / data.app.source
+
         if not app_src.is_dir():
             error(f"[red]App source {data.app.source} not found in package!")
 
     def copy_ignore_func(dir: StrPath, files: list[str]) -> list[str]:
         dir = Path(dir)
+
         return [
             str(dir.relative_to(cache_dir) / file)
             for file in files
